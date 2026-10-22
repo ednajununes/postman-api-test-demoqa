@@ -1,0 +1,284 @@
+{
+  "info": {
+    "_postman_id": "23c76ec6-bb87-4fec-a698-5a329ad4bb9a",
+    "name": "demo qa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59134599",
+    "_collection_link": "https://go.postman.co/collection/59134599-23c76ec6-bb87-4fec-a698-5a329ad4bb9a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Usuario",
+      "item": [
+        {
+          "name": "Gerar nova conta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const resposta = pm.response.json();\r\n\r\npm.test(\"User ID gerado\", function () {\r\n    pm.response.to.have.status(201);\r\n    pm.expect(resposta.userID).to.exist;\r\n});\r\n\r\npm.collectionVariables.set(\"userID\", resposta.userID);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const numeroAleatorio = Math.floor(Math.random() * 10000);\r\n\r\nconst username = `Teste Edna ${numeroAleatorio}`;\r\nconst password = \"Teste@210\";\r\n\r\npm.collectionVariables.set(\"username\", username);\r\npm.collectionVariables.set(\"password\", password);\r\nconsole.log(\"Usuário gerado:\", username);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"userName\": \"{{username}}\",\r\n\"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/Account/v1/User",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "Account",
+                "v1",
+                "User"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerar access token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const resposta = pm.response.json();\r\n\r\npm.test(\"Token gerado com sucesso\", function () {\r\n    pm.response.to.have.status(200);\r\n    pm.expect(resposta.token).to.be.a(\"string\").and.not.empty;\r\n});\r\n\r\npm.collectionVariables.set(\"token\", resposta.token);\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"userName\": \"{{username}}\",\r\n\"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/Account/v1/GenerateToken",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "Account",
+                "v1",
+                "GenerateToken"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar autorização",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Usuário autorizado\", function () {\r\n    pm.response.to.have.status(200);\r\n    pm.expect(pm.response.json()).to.eql(true);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"userName\": \"{{username}}\",\r\n\"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/Account/v1/Authorized",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "Account",
+                "v1",
+                "Authorized"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Livros",
+      "item": [
+        {
+          "name": "Listar livros disponiveis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/BookStore/v1/Books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "BookStore",
+                "v1",
+                "Books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aluguel de livros",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"{{userID}}\",\r\n  \"collectionOfIsbns\": [\r\n    {\r\n      \"isbn\": \"9781593277574\"\r\n    },\r\n    {\r\n      \"isbn\": \"9781593275846\"\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/BookStore/v1/Books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "BookStore",
+                "v1",
+                "Books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar livros",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/Account/v1/User/{{userID}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "Account",
+                "v1",
+                "User",
+                "{{userID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://demoqa.com"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userID",
+      "value": ""
+    },
+    {
+      "key": "username",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    }
+  ]
+}
